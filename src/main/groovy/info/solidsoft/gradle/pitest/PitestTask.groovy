@@ -40,6 +40,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.options.Option
 
+import javax.inject.Inject
 import java.nio.charset.Charset
 
 /**
@@ -48,7 +49,7 @@ import java.nio.charset.Charset
 @CompileStatic
 @CacheableTask
 @SuppressWarnings("UnstableApiUsage")   //@Option
-class PitestTask extends JavaExec {
+abstract class PitestTask extends JavaExec {
 
     @Input
     @Optional
@@ -258,10 +259,9 @@ class PitestTask extends JavaExec {
     @Internal
     File rootDir
 
-    PitestTask() {
+    @Inject
+    PitestTask(ObjectFactory of) {
         getMainClass().set("org.pitest.mutationtest.commandline.MutationCoverageReport")
-
-        ObjectFactory of = project.objects
         rootDir = project.rootDir
 
         testPlugin = of.property(String)

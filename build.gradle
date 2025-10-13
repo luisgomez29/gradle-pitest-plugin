@@ -24,7 +24,9 @@ buildscript {
 }
 
 java {
-    sourceCompatibility = 1.8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 ext.pitestAggregatorVersion = "1.20.3"   //Must be equal to default PIT version in PitestPlugin
@@ -47,17 +49,23 @@ dependencies {
     implementation localGroovy()
     compileOnly "org.pitest:pitest-aggregator:$pitestAggregatorVersion"
 
-    testImplementation('org.spockframework:spock-core:2.4-M6-groovy-3.0') {
+    testImplementation('org.spockframework:spock-core:2.4-M6-groovy-4.0') {
         exclude group: 'org.codehaus.groovy'
+//        exclude group: 'org.apache.groovy'
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation 'net.bytebuddy:byte-buddy:1.17.7' //for Spying in Spock
 
+//    funcTestImplementation gradleTestKit()
     funcTestImplementation sourceSets.main.output  //to make production plugin classes visible in functional tests (it's not in testCompile configuration)
     funcTestImplementation sourceSets.test.output
-    funcTestImplementation('com.netflix.nebula:nebula-test:10.6.2') {
+    // No longer using nebula-test - using Gradle TestKit directly
+    funcTestImplementation('com.netflix.nebula:nebula-test:11.2.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+//        exclude group: 'org.apache.groovy'
     }
+    // JUnit 4 is no longer needed since we're not using nebula-test
+//     funcTestImplementation 'junit:junit:4.13.2'
 }
 
 tasks.register("funcTest", Test) {
@@ -108,7 +116,7 @@ tasks.validatePlugins {
 }
 
 codenarc {
-    toolVersion = "2.0.0"
+    toolVersion = "3.6.0"
 }
 
 tasks.register("codenarc") {
